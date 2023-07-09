@@ -149,14 +149,14 @@ async def clear(interaction: discord.Interaction, amount: int = 0):
     channel = interaction.channel
     if interaction.user.guild_permissions.manage_messages:
         try:
-            await interaction.response.send_message("*standby*", ephemeral=True, delete_after=1)
+            await interaction.response.defer()
             await channel.purge(limit=amount + 0)
             embed = discord.Embed(title=f"{interaction.user.name} cleared {amount} Messages",
                                   color=discord.Colour.from_rgb(177, 26, 33))
             embed.add_field(name="🆔 **User ID**", value=interaction.user.id)
             embed.add_field(name="📆**Cleared Messages At**", value=interaction.created_at.strftime("%d/%m/%Y %H:%M:%S"))
             embed.set_footer(text="🌌 Cosmos • VampiricShadow")
-            await channel.send(embed=embed,  delete_after=5)
+            await channel.send(embed=embed,  delete_after=30)
             log = client.get_channel(990388132815990824)
             await log.send(embed=embed)
         except ValueError:
@@ -434,58 +434,53 @@ async def level(interaction: discord.Interaction):
 @client.tree.command(name="setlevel", description="displays your level")
 async def setlevel(interaction: discord.Interaction, user: discord.User, level: int = 0):
     if interaction.user.guild_permissions.administrator:
-        if level >= 200:
-            await user.add_roles(interaction.guild.get_role(1127579753663172608))
-        elif level >= 160:
-            await user.add_roles(interaction.guild.get_role(1127583438690603079))
-        elif level >= 130:
-            await user.add_roles(interaction.guild.get_role(1127583471947235338))
-        elif level >= 115:
-            await user.add_roles(interaction.guild.get_role(1127583507514929294))
-        elif level >= 90:
-            await user.add_roles(interaction.guild.get_role(1127583535272820737))
-        elif level >= 80:
-            await user.add_roles(interaction.guild.get_role(1127583573856239627))
-        elif level >= 70:
-            await user.add_roles(interaction.guild.get_role(1127583602851446814))
-        elif level >= 60:
-            await user.add_roles(interaction.guild.get_role(1127583919001313450))
-        elif level >= 50:
-            await user.add_roles(interaction.guild.get_role(1127583980565299273))
-        elif level >= 45:
-            await user.add_roles(interaction.guild.get_role(1127584069883019375))
-        elif level >= 40:
-            await user.add_roles(interaction.guild.get_role(1127584121418416178))
-        elif level >= 35:
-            await user.add_roles(interaction.guild.get_role(1127584186715353098))
-        elif level >= 30:
-            await user.add_roles(interaction.guild.get_role(1127584248652627999))
-        elif level >= 25:
-            await user.add_roles(interaction.guild.get_role(1127584304713695323))
-        elif level >= 20:
-            await user.add_roles(interaction.guild.get_role(1127584356777599047))
-        elif level >= 15:
-            await user.add_roles(interaction.guild.get_role(1127584401342091314))
-        elif level >= 10:
-            await user.add_roles(interaction.guild.get_role(1127584455456981002))
-        elif level >= 5:
-            await user.add_roles(interaction.guild.get_role(1127584523702521916))
-        elif level >= 0:
-            await user.add_roles(interaction.guild.get_role(1127584577683202148))
+        await interaction.response.defer()
+        roles = {
+        0:   1127584577683202148,
+        5:   1127584523702521916,
+        10:  1127584455456981002,
+        15:  1127584401342091314,
+        20:  1127584356777599047,
+        25:  1127584304713695323,
+        30:  1127584248652627999,
+        35:  1127584186715353098,
+        40:  1127584121418416178,
+        45:  1127584069883019375,
+        50:  1127583980565299273,
+        60:  1127583919001313450,
+        70:  1127583602851446814,
+        80:  1127583573856239627,
+        90:  1127583535272820737,
+        115: 1127583507514929294,
+        130: 1127583471947235338,
+        160: 1127583438690603079,
+        200: 1127579753663172608
+        }
+
+        highest_role_id = None
+
+        for role_level, role_id in roles.items():
+            if interaction.guild.get_role(role_id) in user.roles:
+                await user.remove_roles(interaction.guild.get_role(role_id))
+
+        for role_level, role_id in roles.items():
+            if level >= role_level:
+                highest_role_id = role_id
+            else:
+                break
+
+        if highest_role_id:
+            await user.add_roles(interaction.guild.get_role(highest_role_id))
 
         level = level
         id_value = user.id
         cursor.execute("UPDATE members SET level = ? WHERE id = ?", (level, id_value))
         connection.commit()
 
-        await interaction.response.send_message(
-            f"*Successfully updated the level of {user} to Lvl {level}*", ephemeral=True, delete_after=5
-        )
+        await interaction.followup.send(f"*Successfully updated the level of {user} to Lvl {level}*", ephemeral=True)
 
     else:
-        await interaction.response.send_message(
-            "*Insufficient permission*", ephemeral=True, delete_after=5
-        )
+        await interaction.response.send_message("*Insufficient permission*", ephemeral=True, delete_after=5)
 
 
 
@@ -690,44 +685,42 @@ async def on_message(message):
         await message.channel.send(f"*{message.author.mention} has leveled up to {level}*")
     connection.commit()
 
-    if level >= 200:
-        await message.author.add_Roles(message.guild.get_role(1127579753663172608))
-    elif level >= 160:
-        await message.author.add_roles(message.guild.get_role(1127583438690603079))
-    elif level >= 130:
-        await message.author.add_roles(message.guild.get_role(1127583471947235338))
-    elif level >= 115:
-        await message.author.add_roles(message.guild.get_role(1127583507514929294))
-    elif level >= 90:
-        await message.author.add_roles(message.guild.get_role(1127583535272820737))
-    elif level >= 80:
-        await message.author.add_roles(message.guild.get_role(1127583573856239627))
-    elif level >= 70:
-        await message.author.add_roles(message.guild.get_role(1127583602851446814))
-    elif level >= 60:
-        await message.author.add_roles(message.guild.get_role(1127583919001313450))
-    elif level >= 50:
-        await message.author.add_roles(message.guild.get_role(1127583980565299273))
-    elif level >= 45:
-        await message.author.add_roles(message.guild.get_role(1127584069883019375))
-    elif level >= 40:
-        await message.author.add_roles(message.guild.get_role(1127584121418416178))
-    elif level >= 35:
-        await message.author.add_roles(message.guild.get_role(1127584186715353098))
-    elif level >= 30:
-        await message.author.add_roles(message.guild.get_role(1127584248652627999))
-    elif level >= 25:
-        await message.author.add_roles(message.guild.get_role(1127584304713695323))
-    elif level >= 20:
-        await message.author.add_roles(message.guild.get_role(1127584356777599047))
-    elif level >= 15:
-        await message.author.add_roles(message.guild.get_role(1127584401342091314))
-    elif level >= 10:
-        await message.author.add_roles(message.guild.get_role(1127584455456981002))
-    elif level >= 5:
-        await message.author.add_roles(message.guild.get_role(1127584523702521916))
-    elif level >= 0:
-        await message.author.add_roles(message.guild.get_role(1127584577683202148))
+    roles = {
+    0:   1127584577683202148,
+    5:   1127584523702521916,
+    10:  1127584455456981002,
+    15:  1127584401342091314,
+    20:  1127584356777599047,
+    25:  1127584304713695323,
+    30:  1127584248652627999,
+    35:  1127584186715353098,
+    40:  1127584121418416178,
+    45:  1127584069883019375,
+    50:  1127583980565299273,
+    60:  1127583919001313450,
+    70:  1127583602851446814,
+    80:  1127583573856239627,
+    90:  1127583535272820737,
+    115: 1127583507514929294,
+    130: 1127583471947235338,
+    160: 1127583438690603079,
+    200: 1127579753663172608
+    }
+
+    highest_role_id = None
+
+    for role_level, role_id in roles.items():
+        if interaction.guild.get_role(role_id) in user.roles:
+            await user.remove_roles(interaction.guild.get_role(role_id))
+
+    for role_level, role_id in roles.items():
+        if level >= role_level:
+            highest_role_id = role_id
+        else:
+            break
+
+    if highest_role_id:
+        await user.add_roles(interaction.guild.get_role(highest_role_id))
 
 
 # Run the bot
