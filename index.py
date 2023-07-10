@@ -309,8 +309,8 @@ async def reset(interaction: discord.Interaction, user: discord.User, reason: st
         0,
         0,
         0,
-        0,
-        0)
+        levels,
+        xp)
         try:
             cursor.execute(f"INSERT INTO members VALUES (?, ?, ?, ?, ?, ?, ?);", params)
             connection.commit()
@@ -354,7 +354,7 @@ async def avatar(interaction: discord.Interaction, user: discord.User):
 #---------< suggest >---------#
 @client.tree.command(name="suggest", description="suggest things")
 async def suggest(interaction: discord.Interaction, suggestion: str = None):
-    channel = client.get_channel(1065075901974450298)
+    channel = client.get_channel(1127966000797724805)
     try:
         embed = discord.Embed(title=f"{interaction.user.name}", color=discord.Colour.from_rgb(177, 26, 33))
         embed.add_field(name="💬**Suggestion**", value=suggestion)
@@ -370,7 +370,7 @@ async def suggest(interaction: discord.Interaction, suggestion: str = None):
 @client.tree.command(name="announce", description="Write a uniform announcement")
 async def announce(interaction: discord.Interaction, title: str = None, announcement: str = None):
     if interaction.user.guild_permissions.ban_members:
-        channel = client.get_channel(1127244767714095165)
+        channel = client.get_channel(1020461616040517662)
         try:
             embed = discord.Embed(title="💬**Announcement**", color=discord.Colour.from_rgb(177, 26, 33))
             embed.add_field(name=title, value=announcement)
@@ -390,9 +390,9 @@ async def ping(interaction: discord.Interaction):
     await interaction.response.send_message(f"*pong! My ping is {round(client.latency * 1000)}ms*", ephemeral=True)
 
 
-#---------< level >---------#
-@client.tree.command(name="level", description="displays your level")
-async def level(interaction: discord.Interaction):
+#---------< rank >---------#
+@client.tree.command(name="rank", description="displays your level")
+async def rank(interaction: discord.Interaction):
     id_value = interaction.user.id
     cursor.execute("SELECT * FROM members WHERE id = ?", (id_value,))
     row = cursor.fetchone()
@@ -492,13 +492,13 @@ class verifyButton(View):
     @button(label="Verify", style=discord.ButtonStyle.green, emoji="✔️", custom_id="verify")
     async def close(self, interaction: discord.Interaction, button: Button):
         await interaction.response.defer(ephemeral=True)
-        await interaction.user.add_roles(interaction.guild.get_role(959811526842282036))
+        await interaction.user.add_roles(interaction.guild.get_role(1127584577683202148))
 
 
 #---------< verify command >---------#
 @client.tree.command(name="verify", description="verification")
 async def verify(interaction: discord.Interaction):
-    if interaction.guild.get_role(959811526842282036) not in interaction.user.roles:
+    if interaction.guild.get_role(1127584577683202148) not in interaction.user.roles:
         embed=discord.Embed(description="If you have understood the rules please press the Verification button!", color=discord.Colour.from_rgb(177, 26, 33))
         embed.set_footer(text="🌌 Cosmos • VampiricShadow")
         await interaction.response.send_message(embed=embed, view=verifyButton(), ephemeral=True, delete_after=120)                                                                                                                                                                                                                               
@@ -544,12 +544,12 @@ class CreateButton(View):
     @button(label="Create Ticket", style=discord.ButtonStyle.blurple, emoji="🎟️", custom_id="ticketopen")
     async def ticket(self, interaction: discord.Interaction, button: Button):
         await interaction.response.defer(ephemeral=True)
-        category: discord.CategoryChannel = discord.utils.get(interaction.guild.categories, id=1127316268173758674)
+        category: discord.CategoryChannel = discord.utils.get(interaction.guild.categories, id=1127963010334457967) # Ticket
         for ch in category.text_channels:
             if ch.topic == f"{interaction.user.id} DO NOT CHANGE TE TOPIC OF THIS CHANNEL!":
                 await interaction.followup.send("You already have a ticket in {0}".format(ch.mention), ephemeral=True)
                 return
-        r1: discord.Role = interaction.guild.get_role(959813484294586409)
+        r1: discord.Role = interaction.guild.get_role(1127955868667875368)
         overwrites = {
             interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False),
             r1: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_messages=True),
@@ -579,9 +579,9 @@ class CloseButton(View):
         await interaction.channel.send("Closing this ticket in 3 seconds")
         await asyncio.sleep(3)
 
-        category: discord.CategoryChannel = discord.utils.get(interaction.guild.categories, id=1127317613903626411)
+        category: discord.CategoryChannel = discord.utils.get(interaction.guild.categories, id=1127963076394749963) # closed tickets
 
-        r1: discord.Role = interaction.guild.get_role(959813484294586409)
+        r1: discord.Role = interaction.guild.get_role(1127955868667875368)
         overwrites = {
             interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False),
             r1: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_messages=True),
@@ -646,13 +646,19 @@ async def on_message(message):
     for word in blacklist:
         if word in message.content:
             if message.author.id !=377185902998323203:
-                await message.channel.set_permissions(message.author, send_messages=False)
-                embed = discord.Embed(
-                    title=f"**{message.author.name}** has been automatically  muted by  **Cosmos**", color=discord.Colour.from_rgb(177, 26, 33))
+                id_value = message.author.id
+                await message.delete()
+                cursor.execute("SELECT * FROM members WHERE id = ?", (id_value,))
+                row = cursor.fetchone()
+                if row is not None:
+                    warn = row[4]
+                    warn += 1
+                    cursor.execute("UPDATE members SET warns = ? WHERE id = ?", (warn, id_value))
+                    connection.commit()
+                embed = discord.Embed(title=f"**{message.author.name} has been automatically warned by Cosmos**", color=discord.Colour.from_rgb(177, 26, 33))
                 embed.add_field(name="🆔**User ID**", value=message.author.id)
-                embed.add_field(name="💬**Reason**", value="using blacklisted word")
-                embed.add_field(name="📆**Muted on**", value=message.created_at.strftime("%d/%m/%Y %H:%M:%S"))
-                # embed.set_thumbnail(url=client.avatar.url)
+                embed.add_field(name="💬**Reason**", value="Automatic warn by Cosmos for the usage of bad language.")
+                embed.add_field(name="❗️ **Warns**", value=warn)
                 embed.set_footer(text="🌌 Cosmos • VampiricShadow")
                 await message.channel.send(embed=embed)
                 log = client.get_channel(990388132815990824)
@@ -669,13 +675,19 @@ async def on_message(message):
 
 
     if level < 5:
-        xp += random.randint(1,3)
+        if message.guild.get_role(1127997256457527488) in message.author.roles: # Double xp
+            xp += random.randint(2,6)
+        else: 
+            xp += random.randint(1,3)
         cursor.execute("UPDATE members SET xp = ? WHERE id = ?", (xp, id_value))
 
     else:
         rand = random.randint(1, (level//4))
         if rand == 1:
-            xp += random.randint(1,3)
+            if message.guild.get_role(1127997256457527488) in message.author.roles: # Double xp
+                xp += random.randint(2,6)
+            else: 
+                xp += random.randint(1,3)
             cursor.execute("UPDATE members SET xp = ? WHERE id = ?", (xp, id_value))
     if xp >= 100:
         level += 1
@@ -683,44 +695,44 @@ async def on_message(message):
         cursor.execute("UPDATE members SET level = ? WHERE id = ?", (level, id_value))
         cursor.execute("UPDATE members SET xp = ? WHERE id = ?", (xp, id_value))
         await message.channel.send(f"*{message.author.mention} has leveled up to {level}*")
+
+        roles = {
+        0:   1127584577683202148,
+        5:   1127584523702521916,
+        10:  1127584455456981002,
+        15:  1127584401342091314,
+        20:  1127584356777599047,
+        25:  1127584304713695323,
+        30:  1127584248652627999,
+        35:  1127584186715353098,
+        40:  1127584121418416178,
+        45:  1127584069883019375,
+        50:  1127583980565299273,
+        60:  1127583919001313450,
+        70:  1127583602851446814,
+        80:  1127583573856239627,
+        90:  1127583535272820737,
+        115: 1127583507514929294,
+        130: 1127583471947235338,
+        160: 1127583438690603079,
+        200: 1127579753663172608
+        }
+
+        highest_role_id = None
+
+        for role_level, role_id in roles.items():
+            if message.guild.get_role(role_id) in message.author.roles:
+                await message.author.remove_roles(message.guild.get_role(role_id))
+
+        for role_level, role_id in roles.items():
+            if level >= role_level:
+                highest_role_id = role_id
+            else:
+                break
+
+        if highest_role_id:
+            await message.author.add_roles(message.guild.get_role(highest_role_id))
     connection.commit()
-
-    roles = {
-    0:   1127584577683202148,
-    5:   1127584523702521916,
-    10:  1127584455456981002,
-    15:  1127584401342091314,
-    20:  1127584356777599047,
-    25:  1127584304713695323,
-    30:  1127584248652627999,
-    35:  1127584186715353098,
-    40:  1127584121418416178,
-    45:  1127584069883019375,
-    50:  1127583980565299273,
-    60:  1127583919001313450,
-    70:  1127583602851446814,
-    80:  1127583573856239627,
-    90:  1127583535272820737,
-    115: 1127583507514929294,
-    130: 1127583471947235338,
-    160: 1127583438690603079,
-    200: 1127579753663172608
-    }
-
-    highest_role_id = None
-
-    for role_level, role_id in roles.items():
-        if interaction.guild.get_role(role_id) in user.roles:
-            await user.remove_roles(interaction.guild.get_role(role_id))
-
-    for role_level, role_id in roles.items():
-        if level >= role_level:
-            highest_role_id = role_id
-        else:
-            break
-
-    if highest_role_id:
-        await user.add_roles(interaction.guild.get_role(highest_role_id))
 
 
 # Run the bot
