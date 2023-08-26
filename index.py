@@ -17,6 +17,28 @@ from easy_pil import *
 # Load environment variables from .env file
 load_dotenv()
 
+roles = {
+0:   1127584577683202148,
+5:   1127584523702521916,
+10:  1127584455456981002,
+15:  1127584401342091314,
+20:  1127584356777599047,
+25:  1127584304713695323,
+30:  1127584248652627999,
+35:  1127584186715353098,
+40:  1127584121418416178,
+45:  1127584069883019375,
+50:  1127583980565299273,
+60:  1127583919001313450,
+70:  1127583602851446814,
+80:  1127583573856239627,
+90:  1127583535272820737,
+115: 1127583507514929294,
+130: 1127583471947235338,
+160: 1127583438690603079,
+200: 1127579753663172608
+}
+
 config = {} 
 try:
     with open('config.json') as file:
@@ -99,7 +121,7 @@ async def ban_user(interaction: discord.Interaction, user: discord.User, reason:
             embed.add_field(name="🆔**User ID**", value=user.id)
             embed.add_field(name="💬**Reason**", value=reason)
             embed.set_thumbnail(url=user.avatar.url)
-            embed.set_footer(text="🌌 Cosmos • VampiricShadow")
+            embed.set_footer(text=f"{config['name']} • VampiricShadow")
             await interaction.response.send_message(embed=embed)
             log = client.get_channel(config['log_channel'])
             await log.send(embed=embed)
@@ -132,7 +154,7 @@ async def kick_user(interaction: discord.Interaction, user: discord.User, reason
             embed.add_field(name="🆔**User ID**", value=user.id)
             embed.add_field(name="💬**Reason**", value=reason)
             embed.set_thumbnail(url=user.avatar.url)
-            embed.set_footer(text="🌌 Cosmos • VampiricShadow")
+            embed.set_footer(text=f"{config['name']} • VampiricShadow")
             await interaction.response.send_message(embed=embed)
             log = client.get_channel(config['log_channel'])
             await log.send(embed=embed)
@@ -166,7 +188,7 @@ async def clear(interaction: discord.Interaction, amount: int = 0):
                                   color=discord.Colour.from_rgb(177, 26, 33))
             embed.add_field(name="🆔 **User ID**", value=interaction.user.id)
             embed.add_field(name="📆**Cleared Messages At**", value=interaction.created_at.strftime("%d/%m/%Y %H:%M:%S"))
-            embed.set_footer(text="🌌 Cosmos • VampiricShadow")
+            embed.set_footer(text=f"{config['name']} • VampiricShadow")
             await channel.send(embed=embed,  delete_after=30)
             log = client.get_channel(config['log_channel'])
             await log.send(embed=embed)
@@ -187,7 +209,7 @@ async def unmute_user(interaction: discord.Interaction, user: discord.User, reas
         embed.add_field(name="🆔**User ID**", value=user.id)
         embed.add_field(name="💬**Reason**", value=reason)
         embed.add_field(name="📆**Unmuted on**", value=interaction.created_at.strftime("%d/%m/%Y %H:%M:%S"))
-        embed.set_footer(text="🌌 Cosmos • VampiricShadow")
+        embed.set_footer(text=f"{config['name']} • VampiricShadow")
         await interaction.response.send_message(embed=embed)
         log = client.get_channel(config['log_channel'])
         await log.send(embed=embed)
@@ -207,7 +229,7 @@ async def mute_user(interaction: discord.Interaction, user: discord.User, reason
         embed.add_field(name="💬**Reason**", value=reason)
         embed.add_field(name="📆**Muted on**", value=interaction.created_at.strftime("%d/%m/%Y %H:%M:%S"))
         embed.add_field(name="🕒**Muted for**", value=f"{time} seconds")
-        embed.set_footer(text="🌌 Cosmos • VampiricShadow")
+        embed.set_footer(text=f"{config['name']} • VampiricShadow")
         await interaction.response.defer()
         await interaction.followup.send(embed=embed)
         log = client.get_channel(config['log_channel'])
@@ -249,7 +271,7 @@ async def info(interaction: discord.Interaction, user: discord.User):
         embed.add_field(name="🚫 **Kicks**", value=kicks)
         embed.add_field(name="🔕 **Mutes**", value=mutes)
         embed.add_field(name="❗️ **Warns**", value=warns)
-        embed.set_footer(text="🌌 Cosmos • VampiricShadow")
+        embed.set_footer(text=f"{config['name']} • VampiricShadow")
         await interaction.response.send_message(embed=embed)
     else:
         await interaction.response.send_message("*insufficient permission*", ephemeral=True, delete_after=5)
@@ -271,7 +293,7 @@ async def warn(interaction: discord.Interaction, user: discord.User, reason: str
         embed.add_field(name="🆔**User ID**", value=user.id)
         embed.add_field(name="💬**Reason**", value=reason)
         embed.add_field(name="❗️ **Warns**", value=warn)
-        embed.set_footer(text="🌌 Cosmos • VampiricShadow")
+        embed.set_footer(text=f"{config['name']} • VampiricShadow")
         await interaction.response.send_message(embed=embed)
         log = client.get_channel(config['log_channel'])
         await log.send(embed=embed)
@@ -309,7 +331,7 @@ async def reset(interaction: discord.Interaction, user: discord.User, reason: st
         embed.add_field(name="🔕 **Mutes**", value=mutes)
         embed.add_field(name="❗️ **Warns**", value=warns)
         embed.add_field(name="📆**Date**", value=interaction.created_at.strftime("%d/%m/%Y %H:%M:%S"))
-        embed.set_footer(text="🌌 Cosmos • VampiricShadow")
+        embed.set_footer(text=f"{config['name']} • VampiricShadow")
         log = client.get_channel(config['log_channel'])
         await log.send(embed=embed)
 
@@ -350,7 +372,7 @@ async def serverinfo(interaction: discord.Interaction):
     embed.add_field(name="👑**Server Owner**", value=server.owner)
     embed.add_field(name="👥**Server Member Count**", value=server.member_count)
     embed.set_thumbnail(url=server.icon.url)
-    embed.set_footer(text="🌌 Cosmos • VampiricShadow")
+    embed.set_footer(text=f"{config['name']} • VampiricShadow")
     await interaction.response.send_message(embed=embed)
 
 
@@ -358,7 +380,7 @@ async def serverinfo(interaction: discord.Interaction):
 @client.tree.command(name="avatar", description="prints the users avatar")
 async def avatar(interaction: discord.Interaction, user: discord.User):
     embed = discord.Embed(title=f"**{user}s Avatar:**", color=discord.Colour.from_rgb(177, 26, 33)).set_image(url=user.avatar.url)
-    embed.set_footer(text="🌌 Cosmos • VampiricShadow")
+    embed.set_footer(text=f"{config['name']} • VampiricShadow")
     await interaction.response.send_message(embed=embed)
 
 
@@ -446,27 +468,6 @@ async def rank(interaction: discord.Interaction):
 async def setlevel(interaction: discord.Interaction, user: discord.User, level: int = 0):
     if interaction.user.guild_permissions.administrator:
         await interaction.response.defer()
-        roles = {
-        0:   1127584577683202148,
-        5:   1127584523702521916,
-        10:  1127584455456981002,
-        15:  1127584401342091314,
-        20:  1127584356777599047,
-        25:  1127584304713695323,
-        30:  1127584248652627999,
-        35:  1127584186715353098,
-        40:  1127584121418416178,
-        45:  1127584069883019375,
-        50:  1127583980565299273,
-        60:  1127583919001313450,
-        70:  1127583602851446814,
-        80:  1127583573856239627,
-        90:  1127583535272820737,
-        115: 1127583507514929294,
-        130: 1127583471947235338,
-        160: 1127583438690603079,
-        200: 1127579753663172608
-        }
 
         highest_role_id = None
 
@@ -511,7 +512,7 @@ class verifyButton(View):
 async def verify(interaction: discord.Interaction):
     if interaction.guild.get_role(config['verify_role']) not in interaction.user.roles:
         embed=discord.Embed(description="If you have understood the rules please press the Verification button!", color=discord.Colour.from_rgb(177, 26, 33))
-        embed.set_footer(text="🌌 Cosmos • VampiricShadow")
+        embed.set_footer(text=f"{config['name']} • VampiricShadow")
         await interaction.response.send_message(embed=embed, view=verifyButton(), ephemeral=True, delete_after=120)                                                                                                                                                                                                                               
     else:
         await interaction.response.send_message("*insufficient permission*", ephemeral=True, delete_after=5)
@@ -574,7 +575,7 @@ class CreateButton(View):
         )
 
         embed=discord.Embed(title="**Ticket Created!**", description="Don't ping a staff member, they will be here soon.", color=discord.Colour.from_rgb(177, 26, 33))
-        embed.set_footer(text="🌌 Cosmos • VampiricShadow")
+        embed.set_footer(text=f"{config['name']} • VampiricShadow")
         await channel.send(embed=embed, view=CloseButton())
 
 
@@ -606,7 +607,7 @@ class CloseButton(View):
 @client.tree.command(name="ticket", description="create a ticket")
 async def ticket(interaction: discord.Interaction):
     embed=discord.Embed(description="Press the button to open a new ticket!", color=discord.Colour.from_rgb(177, 26, 33))
-    embed.set_footer(text="🌌 Cosmos • VampiricShadow")
+    embed.set_footer(text=f"{config['name']} • VampiricShadow")
     await interaction.response.send_message(embed=embed, view=CreateButton(), ephemeral=True, delete_after=120)
     
 
@@ -626,7 +627,7 @@ async def on_member_join(member):
     embed.add_field(name="📚**Rules**", value="Please make sure that you read the rules")
     embed.add_field(name="❓**Support**", value="If you have any questions open a ticket ")
     embed.add_field(name="🍿**Enjoy**", value=f"Have Fun and enjoy chatting and talking on the Server **{server.name}**")
-    embed.set_footer(text="🌌 Cosmos • VampiricShadow")
+    embed.set_footer(text=f"{config['name']} • VampiricShadow")
     try:
         await member.send(embed=embed)
     except Exception as e:
@@ -670,7 +671,7 @@ async def on_message(message):
                 embed.add_field(name="🆔**User ID**", value=message.author.id)
                 embed.add_field(name="💬**Reason**", value="Automatic warn by Cosmos for the usage of bad language.")
                 embed.add_field(name="❗️ **Warns**", value=warn)
-                embed.set_footer(text="🌌 Cosmos • VampiricShadow")
+                embed.set_footer(text=f"{config['name']} • VampiricShadow")
                 await message.channel.send(embed=embed)
                 log = client.get_channel(config['log_channel'])
                 await log.send(embed=embed)
@@ -706,28 +707,6 @@ async def on_message(message):
         cursor.execute("UPDATE members SET level = ? WHERE id = ?", (level, id_value))
         cursor.execute("UPDATE members SET xp = ? WHERE id = ?", (xp, id_value))
         await message.channel.send(f"*{message.author.mention} has leveled up to {level}*")
-
-        roles = {
-        0:   1127584577683202148,
-        5:   1127584523702521916,
-        10:  1127584455456981002,
-        15:  1127584401342091314,
-        20:  1127584356777599047,
-        25:  1127584304713695323,
-        30:  1127584248652627999,
-        35:  1127584186715353098,
-        40:  1127584121418416178,
-        45:  1127584069883019375,
-        50:  1127583980565299273,
-        60:  1127583919001313450,
-        70:  1127583602851446814,
-        80:  1127583573856239627,
-        90:  1127583535272820737,
-        115: 1127583507514929294,
-        130: 1127583471947235338,
-        160: 1127583438690603079,
-        200: 1127579753663172608
-        }
 
         highest_role_id = None
 
