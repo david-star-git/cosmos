@@ -6,6 +6,7 @@ from discord.utils import get
 from discord.ui import View, Button, button
 
 from dotenv import load_dotenv
+import json
 import os
 import asyncio
 import json
@@ -16,11 +17,21 @@ from easy_pil import *
 # Load environment variables from .env file
 load_dotenv()
 
+config = {} 
+try:
+    with open('config.json') as file:
+        config = json.load(file)
+        print("successfully loaded config.json")
+except FileNotFoundError:
+    print("File not found.")
+except json.JSONDecodeError:
+    print("Invalid json format")
+
 intents = discord.Intents.all()
 intents.message_content = True
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
-client = commands.Bot(command_prefix='/', intents=intents, application_id=1061127271081062532)
+client = commands.Bot(command_prefix='/', intents=intents, application_id=config['id'])
 
 
 blacklist = [
@@ -90,7 +101,7 @@ async def ban_user(interaction: discord.Interaction, user: discord.User, reason:
             embed.set_thumbnail(url=user.avatar.url)
             embed.set_footer(text="🌌 Cosmos • VampiricShadow")
             await interaction.response.send_message(embed=embed)
-            log = client.get_channel(990388132815990824)
+            log = client.get_channel(config['log_channel'])
             await log.send(embed=embed)
             try:
                 await user.send(embed=embed)
@@ -123,7 +134,7 @@ async def kick_user(interaction: discord.Interaction, user: discord.User, reason
             embed.set_thumbnail(url=user.avatar.url)
             embed.set_footer(text="🌌 Cosmos • VampiricShadow")
             await interaction.response.send_message(embed=embed)
-            log = client.get_channel(990388132815990824)
+            log = client.get_channel(config['log_channel'])
             await log.send(embed=embed)
             try:
                 await user.send(embed=embed)
@@ -157,7 +168,7 @@ async def clear(interaction: discord.Interaction, amount: int = 0):
             embed.add_field(name="📆**Cleared Messages At**", value=interaction.created_at.strftime("%d/%m/%Y %H:%M:%S"))
             embed.set_footer(text="🌌 Cosmos • VampiricShadow")
             await channel.send(embed=embed,  delete_after=30)
-            log = client.get_channel(990388132815990824)
+            log = client.get_channel(config['log_channel'])
             await log.send(embed=embed)
         except ValueError:
             await interaction.response.send_message("*Please enter a valid number of messages to be deleted*", ephemeral=True, delete_after=5)
@@ -166,7 +177,7 @@ async def clear(interaction: discord.Interaction, amount: int = 0):
 
 
 #---------< unmute >---------#
-@client.tree.command(name="unmute", description="unmutes a user from the chat")
+@client.tree.command(name="unmute", description="unmutes a user")
 async def unmute_user(interaction: discord.Interaction, user: discord.User, reason: str = None):
     channel = interaction.channel
     if interaction.user.guild_permissions.manage_messages:
@@ -178,14 +189,14 @@ async def unmute_user(interaction: discord.Interaction, user: discord.User, reas
         embed.add_field(name="📆**Unmuted on**", value=interaction.created_at.strftime("%d/%m/%Y %H:%M:%S"))
         embed.set_footer(text="🌌 Cosmos • VampiricShadow")
         await interaction.response.send_message(embed=embed)
-        log = client.get_channel(990388132815990824)
+        log = client.get_channel(config['log_channel'])
         await log.send(embed=embed)
     else:
         await interaction.response.send_message("*insufficient permission*", ephemeral=True, delete_after=5)
 
 
 #---------< mute >---------#
-@client.tree.command(name="mute", description="mutes a user from the chat")
+@client.tree.command(name="mute", description="mutes a user")
 async def mute_user(interaction: discord.Interaction, user: discord.User, reason: str = None, time: int = 0):
     channel = interaction.channel
     if interaction.user.guild_permissions.manage_messages:
@@ -199,7 +210,7 @@ async def mute_user(interaction: discord.Interaction, user: discord.User, reason
         embed.set_footer(text="🌌 Cosmos • VampiricShadow")
         await interaction.response.defer()
         await interaction.followup.send(embed=embed)
-        log = client.get_channel(990388132815990824)
+        log = client.get_channel(config['log_channel'])
         await log.send(embed=embed)
         await asyncio.sleep(time)
         await channel.set_permissions(user, send_messages=True)
@@ -262,7 +273,7 @@ async def warn(interaction: discord.Interaction, user: discord.User, reason: str
         embed.add_field(name="❗️ **Warns**", value=warn)
         embed.set_footer(text="🌌 Cosmos • VampiricShadow")
         await interaction.response.send_message(embed=embed)
-        log = client.get_channel(990388132815990824)
+        log = client.get_channel(config['log_channel'])
         await log.send(embed=embed)
 
     else:
@@ -299,7 +310,7 @@ async def reset(interaction: discord.Interaction, user: discord.User, reason: st
         embed.add_field(name="❗️ **Warns**", value=warns)
         embed.add_field(name="📆**Date**", value=interaction.created_at.strftime("%d/%m/%Y %H:%M:%S"))
         embed.set_footer(text="🌌 Cosmos • VampiricShadow")
-        log = client.get_channel(990388132815990824)
+        log = client.get_channel(config['log_channel'])
         await log.send(embed=embed)
 
         cursor.execute("DELETE FROM members WHERE id = ?", (id_value,))
@@ -354,7 +365,7 @@ async def avatar(interaction: discord.Interaction, user: discord.User):
 #---------< suggest >---------#
 @client.tree.command(name="suggest", description="suggest things")
 async def suggest(interaction: discord.Interaction, suggestion: str = None):
-    channel = client.get_channel(1127966000797724805)
+    channel = client.get_channel(config['suggestion_channel'])
     try:
         embed = discord.Embed(title=f"{interaction.user.name}", color=discord.Colour.from_rgb(177, 26, 33))
         embed.add_field(name="💬**Suggestion**", value=suggestion)
@@ -370,7 +381,7 @@ async def suggest(interaction: discord.Interaction, suggestion: str = None):
 @client.tree.command(name="announce", description="Write a uniform announcement")
 async def announce(interaction: discord.Interaction, title: str = None, announcement: str = None):
     if interaction.user.guild_permissions.ban_members:
-        channel = client.get_channel(1020461616040517662)
+        channel = client.get_channel(config['announcement_channel'])
         try:
             embed = discord.Embed(title="💬**Announcement**", color=discord.Colour.from_rgb(177, 26, 33))
             embed.add_field(name=title, value=announcement)
@@ -492,13 +503,13 @@ class verifyButton(View):
     @button(label="Verify", style=discord.ButtonStyle.green, emoji="✔️", custom_id="verify")
     async def close(self, interaction: discord.Interaction, button: Button):
         await interaction.response.defer(ephemeral=True)
-        await interaction.user.add_roles(interaction.guild.get_role(1127584577683202148))
+        await interaction.user.add_roles(interaction.guild.get_role(config['verify_role']))
 
 
 #---------< verify command >---------#
 @client.tree.command(name="verify", description="verification")
 async def verify(interaction: discord.Interaction):
-    if interaction.guild.get_role(1127584577683202148) not in interaction.user.roles:
+    if interaction.guild.get_role(config['verify_role']) not in interaction.user.roles:
         embed=discord.Embed(description="If you have understood the rules please press the Verification button!", color=discord.Colour.from_rgb(177, 26, 33))
         embed.set_footer(text="🌌 Cosmos • VampiricShadow")
         await interaction.response.send_message(embed=embed, view=verifyButton(), ephemeral=True, delete_after=120)                                                                                                                                                                                                                               
@@ -544,12 +555,12 @@ class CreateButton(View):
     @button(label="Create Ticket", style=discord.ButtonStyle.blurple, emoji="🎟️", custom_id="ticketopen")
     async def ticket(self, interaction: discord.Interaction, button: Button):
         await interaction.response.defer(ephemeral=True)
-        category: discord.CategoryChannel = discord.utils.get(interaction.guild.categories, id=1127963010334457967) # Ticket
+        category: discord.CategoryChannel = discord.utils.get(interaction.guild.categories, id=config['ticket_category']) # Ticket
         for ch in category.text_channels:
             if ch.topic == f"{interaction.user.id} DO NOT CHANGE TE TOPIC OF THIS CHANNEL!":
                 await interaction.followup.send("You already have a ticket in {0}".format(ch.mention), ephemeral=True)
                 return
-        r1: discord.Role = interaction.guild.get_role(1127955868667875368)
+        r1: discord.Role = interaction.guild.get_role(config['ticket_role'])
         overwrites = {
             interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False),
             r1: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_messages=True),
@@ -579,9 +590,9 @@ class CloseButton(View):
         await interaction.channel.send("Closing this ticket in 3 seconds")
         await asyncio.sleep(3)
 
-        category: discord.CategoryChannel = discord.utils.get(interaction.guild.categories, id=1127963076394749963) # closed tickets
+        category: discord.CategoryChannel = discord.utils.get(interaction.guild.categories, id=config['closed_category']) # closed tickets
 
-        r1: discord.Role = interaction.guild.get_role(1127955868667875368)
+        r1: discord.Role = interaction.guild.get_role(config['ticket_role'])
         overwrites = {
             interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False),
             r1: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_messages=True),
@@ -645,7 +656,7 @@ async def on_message(message):
         return
     for word in blacklist:
         if word in message.content:
-            if message.author.id !=377185902998323203:
+            if message.author.id !=config['owner']:
                 id_value = message.author.id
                 await message.delete()
                 cursor.execute("SELECT * FROM members WHERE id = ?", (id_value,))
@@ -661,7 +672,7 @@ async def on_message(message):
                 embed.add_field(name="❗️ **Warns**", value=warn)
                 embed.set_footer(text="🌌 Cosmos • VampiricShadow")
                 await message.channel.send(embed=embed)
-                log = client.get_channel(990388132815990824)
+                log = client.get_channel(config['log_channel'])
                 await log.send(embed=embed)
             else:
                 print(f"mute prevented on {message.author}")
@@ -675,7 +686,7 @@ async def on_message(message):
 
 
     if level < 5:
-        if message.guild.get_role(1127997256457527488) in message.author.roles: # Double xp
+        if message.guild.get_role(config['double_xp_role']) in message.author.roles: # Double xp
             xp += random.randint(2,6)
         else: 
             xp += random.randint(1,3)
@@ -684,7 +695,7 @@ async def on_message(message):
     else:
         rand = random.randint(1, (level//4))
         if rand == 1:
-            if message.guild.get_role(1127997256457527488) in message.author.roles: # Double xp
+            if message.guild.get_role(config['double_xp_role']) in message.author.roles: # Double xp
                 xp += random.randint(2,6)
             else: 
                 xp += random.randint(1,3)
