@@ -1,5 +1,9 @@
-
 # Discord Bot Readme
+
+## Sprachversionen
+[![Englisch](https://img.shields.io/badge/Englisch-English-blue)](readme.md)
+[![Deutsch](https://img.shields.io/badge/Deutsch-German-blue)](readme_de.md)
+[![Spanisch](https://img.shields.io/badge/Español-Spanish-blue)](readme_es.md)
 
 Willkommen zur Dokumentation für **Cosmos**, ein vielseitiger und leistungsstarker Discord Bot, der entwickelt wurde, um die Erfahrung auf deinem Server zu verbessern. Diese Readme bietet einen Überblick über die Funktionen des Bots und wie man sie effektiv nutzt.
 
