@@ -1,3 +1,4 @@
+
 # Discord Bot Readme
 
 Willkommen zur Dokumentation für **Cosmos**, ein vielseitiger und leistungsstarker Discord Bot, der entwickelt wurde, um die Erfahrung auf deinem Server zu verbessern. Diese Readme bietet einen Überblick über die Funktionen des Bots und wie man sie effektiv nutzt.
