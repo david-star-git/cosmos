@@ -227,3 +227,7 @@ Aquí tienes algunos de los comandos más importantes admitidos por **Cosmos**:
 4. Envía una solicitud de extracción.
 
 ¡Gracias por elegir **Cosmos**! Esperamos que este bot brinde mucho valor y diversión a tu servidor de Discord. Si tienes sugerencias o solicitudes de funciones, ¡no dudes en hacérnoslo saber!
+
+## Licencia
+
+Este proyecto está bajo la [Licencia Pública General de GNU, versión 3.0](LICENSE). Puedes encontrar el texto completo de la licencia [aquí](https://www.gnu.org/licenses/gpl-3.0.html).
