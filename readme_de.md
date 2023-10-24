@@ -227,3 +227,7 @@ Wir begrüßen Beiträge aus der Community! Wenn du zu **Cosmos** beitragen möc
 4. Reiche einen Pull Request ein.
 
 Vielen Dank, dass du **Cosmos** gewählt hast! Wir hoffen, dass dieser Bot deinem Discord Server viel Wert und Freude bringt. Wenn du Vorschläge oder Feature-Anfragen hast, zögere nicht, uns wissen zu lassen!
+
+## Lizenz
+
+Dieses Projekt steht unter der [GNU General Public License, Version 3.0](LICENSE). Den vollständigen Lizenztext finden Sie [hier](https://www.gnu.org/licenses/gpl-3.0.html).
