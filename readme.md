@@ -227,3 +227,7 @@ We welcome contributions from the community! If you'd like to contribute to **Co
 4. Submit a pull request.
 
 Thank you for choosing **Cosmos**! We hope this bot brings value and joy to your Discord server. If you have any suggestions or feature requests, please don't hesitate to let us know!
+
+## License
+
+This project is licensed under the [GNU General Public License, version 3.0](LICENSE). You can find the full license text [here](https://www.gnu.org/licenses/gpl-3.0.html).
